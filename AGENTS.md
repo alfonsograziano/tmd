@@ -8,7 +8,7 @@ The contract for coding agents working in this repository. Read it before you ch
 
 ## The spec is the source of truth
 
-`spec/TYPED_MARKDOWN_SPEC.md` defines the format. `spec/SECOND_BRAIN_SPEC.md` is the larger system the format serves, and gives the "why".
+`spec/TYPED_MARKDOWN_SPEC.md` defines the format. It is the source of truth. When the code and the spec disagree, the code is wrong.
 
 When the code, the README, and the spec disagree, the spec wins and the code is the bug. Do not change the spec files to match the code. If the spec is wrong or unclear, say so in the pull request and write the decision in the "Decisions where the spec was open" section of the README, so the next reader sees it. Never quietly skip part of the spec.
 

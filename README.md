@@ -932,18 +932,15 @@ The spec left some things unsaid. Here is every choice made while implementing i
 
 ## Not implemented
 
-Two things in the spec are deliberately left out, and one dependency rule was bent.
+Two things are deliberately left out, and one dependency rule was bent.
 
 - **The `.tmd/cache/` index cache** (spec section 6.3) is not implemented. The spec says the index "may" be cached. Linting this repo's example project takes a few milliseconds, and a project of a few thousand files stays well inside the spec's two second target, so a cache would only add a way to be wrong. Nothing else depends on it.
-- **`tmd mv`** is not implemented. It is open question 2 in the spec, not part of the CLI surface, and the spec has not decided whether it belongs in v1.
+- **`tmd mv`** is not implemented. It is not part of the CLI surface the spec defines. Renaming a file changes its entity id, so every reference to it has to be rewritten by hand for now.
 - **`@types/node` is a dev dependency**, alongside `typescript`. Without it `tsc --noEmit` cannot typecheck a single call to `node:fs/promises`, so strict typechecking would be impossible. It ships type definitions only, no runtime code. Runtime dependencies are still exactly zero.
 
-## The specs
+## The spec
 
-Both specs this project implements are in `spec/`:
-
-- `spec/TYPED_MARKDOWN_SPEC.md` is the format. It is the source of truth. When this README and the spec disagree, the spec wins and the code is wrong.
-- `spec/SECOND_BRAIN_SPEC.md` is the larger system this format serves. It explains why the format looks the way it does.
+`spec/TYPED_MARKDOWN_SPEC.md` is the format this project implements. It is the source of truth. When this README and the spec disagree, the spec wins and the code is wrong.
 
 ## License
 

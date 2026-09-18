@@ -2,13 +2,12 @@
 type: spec
 title: "Typed Markdown — a small format for semi-structured data in the age of agents"
 status: draft
-version: 0.2
+version: 0.3
 created: 2026-09-18
 updated: 2026-09-18
-version_note: 0.2 adds _type in frontmatter as a second way to declare the type, and a use cases section
+version_note: 0.3 removes the open questions and the section about the wider system it was written for
 author: Alfred
-tags: [second-brain, format, spec]
-related: [SECOND_BRAIN_SPEC.md]
+tags: [format, spec, markdown]
 ---
 
 # Typed Markdown
@@ -343,24 +342,8 @@ Rules for agents, to put in the project's agent instructions:
 - Run `tmd lint` before handing work over. Zero errors.
 - Untyped markdown is fine for prose. The moment a file is a thing with fields, give it a type, in the name or as `_type`, following what the project already does.
 
-## 9. Relationship to the second brain spec
-
-This format is the concrete shape of the **record** layer in the second brain spec. Two adjustments to that spec follow from it:
-
-- The brain's `type:` frontmatter field becomes `_type:`, which this format understands as-is. Timestamp-named files like `1782055272982.md` keep their names and declare `_type: task`. Hand-named files may put the type in the name instead, like `draft-solutions-goals.task.md`. Both are valid in one project.
-- The brain's `schema/` folder is this format's `.tmd/` folder. The `x-brain` block proposed there becomes `x-tmd`.
-
-Ledgers (CSV) and untyped documents stay outside this format. The brain's linter is `tmd lint` plus the brain-specific rules (staleness, lake age, file size) layered on top.
-
-## 10. Implementation sketch
+## 9. Implementation sketch
 
 Node.js, TypeScript, one package, no framework. Dependencies: `js-yaml` for frontmatter, `ajv` plus `ajv-formats` for validation with a custom `tmd-ref` format, `fast-glob` for the walk, `better-sqlite3` behind an optional flag for export. About 500 lines. The whole spec fits in the README.
 
 Order of work: lint with E001 to E008, then `schema show` and `new`, then refs and E004 to E006, then export. Each step is useful on its own.
-
-## 11. Open questions
-
-1. **Name.** Typed Markdown / `.tmd` is a placeholder.
-2. **Slug always comes from the file name.** The type may come from the name or from `_type`, but the slug never comes from the frontmatter. Renaming a file therefore changes its id, so every reference must be rewritten. `tmd mv` would do that. Decide whether that command belongs in v1, and whether an `_id` override is ever worth adding. My lean: `tmd mv` yes, `_id` no.
-3. **Schema for the body.** `x-tmd.sections` is the only body rule. Whether to go further (required tables, word limits) is open. My lean: no. The body is where the format stays free.
-4. **Multiple types per file.** Not supported. A file is one thing. If it feels like two, it is two files.
