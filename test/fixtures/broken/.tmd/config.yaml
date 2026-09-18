@@ -1,0 +1,9 @@
+# This project is broken on purpose. Every error and warning code fires here.
+include: ["**/*.md"]
+exclude: ["node_modules/**"]
+untyped: warn            # so W001 shows up
+type_in: filename
+refs:
+  allow_paths: true
+  orphans: warn          # so W002 shows up
+strict: false

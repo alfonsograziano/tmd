@@ -1,0 +1,9 @@
+# Settings for the example project. Every file here lints clean.
+include: ["**/*.md"]
+exclude: ["node_modules/**", ".git/**"]
+untyped: ignore          # README.md has no type, and that is fine
+type_in: filename        # tmd new writes <slug>.<type>.md
+refs:
+  allow_paths: true
+  orphans: ignore        # nothing points at a car, and that is fine here
+strict: false

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "task",
+  "description": "One thing to do.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "status"],
+  "properties": {
+    "title": { "type": "string", "minLength": 3, "description": "What to do." },
+    "status": { "enum": ["todo", "doing", "done"], "default": "todo", "description": "Where it stands." },
+    "effort": { "enum": ["s", "m", "l"], "description": "Rough size." },
+    "owner": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person", "description": "Who does it." }
+  }
+}

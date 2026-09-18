@@ -1,0 +1,7 @@
+{
+  "title": "ghost",
+  "type": "object",
+  "properties": {
+    "_secret": { "type": "string" }
+  }
+}

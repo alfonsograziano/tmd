@@ -1,0 +1,7 @@
+include: ["**/*.md"]
+untyped: warn
+type_in: frontmatter
+refs:
+  allow_paths: false
+  orphans: ignore
+strict: false

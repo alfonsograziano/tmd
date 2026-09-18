@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "person",
+  "description": "A person this project talks about.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1, "description": "Full name." },
+    "email": { "type": "string", "format": "email", "description": "Email address." },
+    "role": { "type": "string", "description": "What they do." },
+    "drives": {
+      "type": "array",
+      "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": ["car"] },
+      "description": "Cars they drive."
+    },
+    "created": { "type": "string", "format": "date" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+  "x-tmd": { "plural": "people" }
+}
