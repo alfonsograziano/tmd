@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "person",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "mentor": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person", "description": "Who taught them." },
+    "created": { "type": "string", "format": "date" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "_common",
+  "description": "Fields every entity in this project carries.",
+  "type": "object",
+  "properties": {
+    "created": { "type": "string", "format": "date", "description": "The day the file was written." },
+    "tags": { "type": "array", "items": { "type": "string" }, "description": "Free tags." }
+  },
+  "required": ["created"]
+}
