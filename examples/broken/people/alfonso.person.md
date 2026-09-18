@@ -1,9 +1,8 @@
 ---
 name: Alfonso Graziano
-mentor: alfonso.person
 created: 2026-01-12
 ---
 
 # Alfonso Graziano
 
-Listed as his own mentor.
+Pointed at by a task that should not point at a person.

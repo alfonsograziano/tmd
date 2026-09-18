@@ -52,21 +52,21 @@ The tool has **zero runtime dependencies**. The YAML parser, the JSON Schema val
 
 ```
 mkdir my-brain && cd my-brain
-mkdir .tmd cars engines
+mkdir .tmd tasks projects
 ```
 
-Write a schema at `.tmd/car.schema.json`:
+Write a schema at `.tmd/task.schema.json`:
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "car",
+  "title": "task",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "year"],
+  "required": ["title", "status"],
   "properties": {
-    "name": { "type": "string", "minLength": 1 },
-    "year": { "type": "integer", "minimum": 1886 }
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["todo", "doing", "blocked", "done"], "default": "todo" }
   }
 }
 ```
@@ -74,7 +74,7 @@ Write a schema at `.tmd/car.schema.json`:
 Create a file and lint it:
 
 ```
-tmd new car honda cars/
+tmd new task write-schemas tasks/
 tmd lint
 ```
 
@@ -89,22 +89,22 @@ That is the whole setup. A folder called `.tmd` with one schema per type, and ma
 <slug>.md               type in the frontmatter, as _type
 ```
 
-- `slug` is the entity's identifier inside its type. Lowercase letters, digits, and hyphens: `honda`, `civic-2019`, `k20`.
-- `type` is the entity type, a singular noun: `car`, `engine`, `person`, `meeting-note`.
-- When the name has two or more dotted segments, the last one is the type and everything before it is the slug. `honda.civic.car.md` is type `car`, slug `honda.civic`.
-- When the name has one segment (`honda.md`), the whole name is the slug and the type must come from `_type`.
+- `slug` is the entity's identifier inside its type. Lowercase letters, digits, and hyphens: `write-schemas`, `book-a-van`, `second-brain`.
+- `type` is the entity type, a singular noun: `task`, `project`, `person`, `meeting-note`.
+- When the name has two or more dotted segments, the last one is the type and everything before it is the slug. `2026.q1-review.task.md` is type `task`, slug `2026.q1-review`.
+- When the name has one segment (`1782055272999.md`), the whole name is the slug and the type must come from `_type`.
 - A markdown file with neither a type segment nor a `_type` field (`README.md`, `notes.md`) is an untyped file. The linter ignores it unless you set `untyped: warn`.
 
 ### Identity
 
-The **entity id** is `<slug>.<type>`, for example `honda.car`, no matter where the type was declared. The id must be unique across the whole project, whatever folder the file sits in. That is what makes references work without paths: move a file to another folder and every reference to its id still resolves.
+The **entity id** is `<slug>.<type>`, for example `write-schemas.task`, no matter where the type was declared. The id must be unique across the whole project, whatever folder the file sits in. That is what makes references work without paths: move a file to another folder and every reference to its id still resolves.
 
 ### Two ways to declare the type
 
 | Way | How | Best for |
 |---|---|---|
-| File name | `honda.car.md` | Files you name yourself. Visible in a directory listing. The linter picks the schema without opening the file. |
-| Frontmatter | `_type: car` as the first key | Files whose names you do not control, like timestamp ids or exports. Explicit when the file is read on its own. |
+| File name | `write-schemas.task.md` | Files you name yourself. Visible in a directory listing. The linter picks the schema without opening the file. |
+| Frontmatter | `_type: task` as the first key | Files whose names you do not control, like timestamp ids or exports. Explicit when the file is read on its own. |
 
 When both are present, `_type` wins, because it is explicit. When the two disagree, one of them is a mistake, so the linter reports W006.
 
@@ -112,70 +112,73 @@ When both are present, `_type` wins, because it is explicit. When the two disagr
 
 Everything below is in `examples/` and lints clean. Run `node ../src/cli.ts lint` from that folder to see for yourself.
 
-`examples/cars/honda.car.md`, a car with the type in the file name:
+`examples/tasks/write-schemas.task.md`, a task with the type in the file name:
 
 ```markdown
 ---
-name: Honda Civic
-year: 2019
-status: owned
-engine: k20.engine
-owners: [alfonso.person]
-specs:
-  power: { value: 158, unit: hp }
-  weight: { value: 1300, unit: kg }
+title: Write the schemas for the second brain
+status: doing
+priority: high
+project: second-brain.project
+assignees: [alfonso.person]
+due: 2026-02-10
+effort:
+  estimate: { value: 6, unit: h }
+  spent: { value: 2, unit: h }
 created: 2026-01-12
-tags: [daily, reliable]
+tags: [schema, deep-work]
 ---
 
-# Honda Civic
+# Write the schemas for the second brain
 
-The daily car. Nothing exciting, and that is the point.
+One schema per type, starting with the types I already use every day.
 
 ## Notes
 
-Bought used with 60,000 km on it. The clutch was changed by the first owner.
+Start with task, because everything else hangs off it. Keep every schema strict, so a wrong field is a lint error and not a surprise six months later.
 ```
 
-`examples/cars/mazda.md`, the same type declared in the frontmatter instead:
+`examples/tasks/1782055272999.md`, the same type declared in the frontmatter instead:
 
 ```markdown
 ---
-_type: car
-name: Mazda RX-8
-year: 2004
-status: wishlist
-engine: 13b.engine
-owners: []
+_type: task
+title: Import the old notes
+status: blocked
+priority: normal
+project: second-brain.project
+assignees: [marta.person]
+blocked_by: write-schemas.task
 created: 2026-02-03
-tags: [weekend]
+tags: [import]
 ---
 
-# Mazda RX-8
+# Import the old notes
 
-The type lives in the frontmatter here, because the file name is just the slug.
+The type lives in the frontmatter here, because the file name is a timestamp.
 
 ## Notes
 
-A rotary needs an owner who likes oil. I am not that owner yet.
+Nothing can move until the schemas are done, so this one waits.
 ```
 
-Its id is still `mazda.car`, because the slug comes from the file name and the type comes from `_type`.
+Its id is `1782055272999.task`, because the slug comes from the file name and the type comes from `_type`. This is the common case for task files: the name is whatever the capture tool produced, so the type has to be written inside.
 
-`examples/engines/k20.engine.md`:
+`examples/projects/second-brain.project.md`:
 
 ```markdown
 ---
-name: Honda K20
-layout: inline-4
-displacement_cc: 1998
+name: Build my second brain
+status: active
+lead: alfonso.person
+next: write-schemas.task
 created: 2026-01-12
-tags: [honda]
+tags: [tooling]
 ---
 
-# Honda K20
+# Build my second brain
 
-Two litres, four cylinders, and a reputation it earned.
+Plain files, a type on each one, and a linter that tells me what is missing.
 ```
 
 `examples/people/alfonso.person.md`:
@@ -184,14 +187,15 @@ Two litres, four cylinders, and a reputation it earned.
 ---
 name: Alfonso Graziano
 email: info@alfonsograziano.it
-role: Owner of the Civic
-drives: [honda.car]
+role: Owner of the second brain
+focus: write-schemas.task
+projects: [second-brain.project]
 created: 2026-01-12
 ---
 
 # Alfonso Graziano
 
-Drives the Civic every day.
+Writes the schemas and reviews what the agent adds.
 ```
 
 ### Rules for a file
@@ -199,7 +203,7 @@ Drives the Civic every day.
 - The file starts with `---` on line one, a YAML block, and a closing `---`. No blank lines before the opening fence.
 - The YAML block is a mapping. A list or a single value at the top level is an error.
 - The body is optional. A file that is only frontmatter is valid.
-- **Keys starting with `_` are reserved for the format.** Schemas may not define them and the validator ignores them. Today the only one is `_type`. Exports add `_id`, `_type`, `_path`, and `_body`. Plain `type` and `id` are ordinary fields a schema may use freely, so a car can have `type: sedan` without confusion.
+- **Keys starting with `_` are reserved for the format.** Schemas may not define them and the validator ignores them. Today the only one is `_type`. Exports add `_id`, `_type`, `_path`, and `_body`. Plain `type` and `id` are ordinary fields a schema may use freely, so a task can have `type: errand` without confusion.
 - `_type`, when present, should be the first key. `tmd lint --fix` moves it there.
 
 ## Schemas
@@ -209,8 +213,8 @@ Drives the Civic every day.
 ```
 .tmd/
   config.yaml            optional project settings
-  car.schema.json        one schema per type
-  engine.schema.json
+  task.schema.json       one schema per type
+  project.schema.json
   person.schema.json
   _common.schema.json    optional, applied to every type
 ```
@@ -219,34 +223,36 @@ A file `<type>.schema.json` defines type `<type>`. The file name is the registra
 
 ### A real schema
 
-This is `examples/.tmd/car.schema.json`:
+This is `examples/.tmd/task.schema.json`:
 
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "car",
-  "description": "A car I own, owned, or am thinking about.",
+  "title": "task",
+  "description": "One thing to do, small enough to finish.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "year"],
+  "required": ["title", "status"],
   "properties": {
-    "name": { "type": "string", "minLength": 1, "description": "What the car is called." },
-    "year": { "type": "integer", "minimum": 1886, "description": "The model year." },
-    "status": { "enum": ["owned", "sold", "wishlist"], "default": "owned", "description": "Where the car sits in my life." },
-    "engine": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "engine", "description": "The engine in this car." },
-    "owners": {
+    "title": { "type": "string", "minLength": 1, "description": "What has to be done." },
+    "status": { "enum": ["todo", "doing", "blocked", "done"], "default": "todo", "description": "Where the task stands." },
+    "priority": { "enum": ["low", "normal", "high"], "default": "normal", "description": "How much it matters." },
+    "project": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "project", "description": "The project this task belongs to." },
+    "assignees": {
       "type": "array",
       "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person" },
-      "description": "People who own or owned it."
+      "description": "People doing the work."
     },
-    "specs": {
+    "blocked_by": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "task", "description": "The task that has to finish first." },
+    "due": { "type": "string", "format": "date", "description": "The day it is due." },
+    "effort": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "power": { "$ref": "#/$defs/measure" },
-        "weight": { "$ref": "#/$defs/measure" }
+        "estimate": { "$ref": "#/$defs/measure" },
+        "spent": { "$ref": "#/$defs/measure" }
       },
-      "description": "Numbers with units."
+      "description": "Time numbers with units."
     },
     "created": { "type": "string", "format": "date" },
     "tags": { "type": "array", "items": { "type": "string" } }
@@ -260,14 +266,14 @@ This is `examples/.tmd/car.schema.json`:
     }
   },
   "x-tmd": {
-    "example": "cars/honda.car.md",
+    "example": "tasks/write-schemas.task.md",
     "sections": ["Notes"],
-    "plural": "cars"
+    "plural": "tasks"
   }
 }
 ```
 
-Nesting comes for free: `specs.power.value` is checked because JSON Schema walks objects. An entity that needs its own identity, or that is referenced from more than one place, becomes its own file instead of a nested object. That is the only rule of thumb about nesting.
+Nesting comes for free: `effort.estimate.value` is checked because JSON Schema walks objects. An entity that needs its own identity, or that is referenced from more than one place, becomes its own file instead of a nested object. That is the only rule of thumb about nesting.
 
 `additionalProperties: false` is recommended in every schema. It is what turns "the agent invented a field" into a lint error instead of silent drift.
 
@@ -312,26 +318,26 @@ Unknown settings are an error, so a typo in the config does not pass quietly.
 
 A reference is a string field whose schema has `"format": "tmd-ref"`. Two value forms are accepted:
 
-- **Id form**: `k20.engine`. Preferred. Survives file moves.
-- **Path form**: `../engines/k20.engine.md`, relative to the referencing file. Useful when a tool generated the link. `tmd lint --fix` rewrites it to the id form.
+- **Id form**: `second-brain.project`. Preferred. Survives file moves.
+- **Path form**: `../projects/second-brain.project.md`, relative to the referencing file. Useful when a tool generated the link. `tmd lint --fix` rewrites it to the id form.
 
 Cardinality is just YAML shape plus schema:
 
 | Relationship | In the schema | In the file |
 |---|---|---|
-| One to one, or many to one | a `tmd-ref` string | `engine: k20.engine` |
-| One to many, or many to many | an array of `tmd-ref` strings | `owners: [alfonso.person, marta.person]` |
-| Many to many with data on the edge | an array of objects, each with a `tmd-ref` field | `owners: [{ person: alfonso.person, since: 2021 }]` |
+| One to one, or many to one | a `tmd-ref` string | `project: second-brain.project` |
+| One to many, or many to many | an array of `tmd-ref` strings | `assignees: [alfonso.person, marta.person]` |
+| Many to many with data on the edge | an array of objects, each with a `tmd-ref` field | `assignees: [{ person: alfonso.person, since: 2026-01-12 }]` |
 
-Two cars pointing at `k20.engine` is a many to one relation. A person listed in the `owners` array of several cars is many to many. Nothing else is needed.
+Two tasks pointing at `second-brain.project` is a many to one relation. A person listed in the `assignees` array of several tasks is many to many. Nothing else is needed.
 
 What the linter checks:
 
 - The target file exists (E004).
-- The target's type is in `x-tmd-ref` when that is set (E005). `engine: alfonso.person` fails with "expected type engine, found person".
+- The target's type is in `x-tmd-ref` when that is set (E005). `project: alfonso.person` fails with "expected type project, found person".
 - No entity references itself, unless the schema sets `x-tmd-ref-self: true` (E011).
 
-**Back references are never written into files.** They are computed. `tmd refs k20.engine` prints who points at it. Writing back references into files would put every relationship in two places, and one of them would go stale.
+**Back references are never written into files.** They are computed. `tmd refs second-brain.project` prints who points at it. Writing back references into files would put every relationship in two places, and one of them would go stale.
 
 ## Use cases and scale
 
@@ -382,15 +388,15 @@ tmd --version
 ```
 $ cd examples
 $ tmd lint
-0 errors, 0 warnings in 7 files
+0 errors, 0 warnings in 8 files
 ```
 
 ```
-$ tmd lint cars/honda.car.md
+$ tmd lint tasks/write-schemas.task.md
 0 errors, 0 warnings in 1 file
 
-$ tmd lint cars           # a folder
-0 errors, 0 warnings in 2 files
+$ tmd lint tasks          # a folder
+0 errors, 0 warnings in 3 files
 ```
 
 ### tmd check
@@ -398,52 +404,56 @@ $ tmd lint cars           # a folder
 The "tell me what is missing" command. It lints one file, then lists every optional field that is not set, with its type and its description from the schema.
 
 ```
-$ tmd check cars/mazda.md
+$ tmd check tasks/1782055272999.md
 0 errors, 0 warnings in 1 file
 
-optional fields not set (1):
-  specs          object
-                 Numbers with units.
+optional fields not set (2):
+  due            string
+                 The day it is due.
+  effort         object
+                 Time numbers with units.
 ```
 
 ### tmd schema list and tmd schema show
 
 ```
 $ tmd schema list
-type    files  schema
-car         2  .tmd/car.schema.json
-engine      2  .tmd/engine.schema.json
-person      2  .tmd/person.schema.json
+type     files  schema
+person       2  .tmd/person.schema.json
+project      2  .tmd/project.schema.json
+task         3  .tmd/task.schema.json
 
 common schema: .tmd/_common.schema.json (applies to every type)
 ```
 
-`tmd schema show car` prints the schema as JSON, then the example file named by `x-tmd.example`, so an agent learns the type from one command.
+`tmd schema show task` prints the schema as JSON, then the example file named by `x-tmd.example`, so an agent learns the type from one command.
 
 ### tmd new
 
 ```
-$ tmd new car civic-2020 cars/
-created cars/civic-2020.car.md
+$ tmd new task review-inbox tasks/
+created tasks/review-inbox.task.md
 ```
 
 The file it writes:
 
 ```markdown
 ---
-name: Civic 2020   # string, What the car is called.
-year: 1886   # integer, The model year.
+title: Review Inbox   # string, What has to be done.
+status: todo   # one of todo, doing, blocked, done, Where the task stands.
 created: 2026-09-18   # string, The day the file was written.
 
 # Optional fields. Uncomment the ones you need.
-# status: owned   # one of owned, sold, wishlist, Where the car sits in my life.
-# engine: TODO.type   # string, reference to type engine, The engine in this car.
-# owners: []   # array, People who own or owned it.
-# specs: {}   # object, Numbers with units.
+# priority: low   # one of low, normal, high, How much it matters.
+# project: TODO.type   # string, reference to type project, The project this task belongs to.
+# assignees: []   # array, People doing the work.
+# blocked_by: TODO.type   # string, reference to type task, The task that has to finish first.
+# due: 2026-09-18   # string, The day it is due.
+# effort: {}   # object, Time numbers with units.
 # tags: []   # array, Free tags.
 ---
 
-# Civic 2020
+# Review Inbox
 
 ## Notes
 ```
@@ -455,15 +465,17 @@ With `type_in: frontmatter` in the config, the same command writes `tasks/178205
 ### tmd refs
 
 ```
-$ tmd refs honda.car
-honda.car  (cars/honda.car.md)
+$ tmd refs write-schemas.task
+write-schemas.task  (tasks/write-schemas.task.md)
 
 outgoing (2):
-  engine -> k20.engine (engines/k20.engine.md)
-  owners.0 -> alfonso.person (people/alfonso.person.md)
+  project -> second-brain.project (projects/second-brain.project.md)
+  assignees.0 -> alfonso.person (people/alfonso.person.md)
 
-incoming (1):
-  alfonso.person <- drives.0 (people/alfonso.person.md)
+incoming (3):
+  1782055272999.task <- blocked_by (tasks/1782055272999.md)
+  alfonso.person <- focus (people/alfonso.person.md)
+  second-brain.project <- next (projects/second-brain.project.md)
 ```
 
 It takes an id or a file path.
@@ -476,28 +488,32 @@ One table per type. Nested objects are kept as objects in JSON and JSONL, flatte
 $ tmd export --format json          # an array, to stdout
 $ tmd export --format jsonl --with-body --out data.jsonl
 $ tmd export --format csv --out out
-wrote out/cars.csv (342 bytes)
-wrote out/engines.csv (261 bytes)
-wrote out/people.csv (287 bytes)
-6 entities, 5 references
+wrote out/people.csv (414 bytes)
+wrote out/projects.csv (324 bytes)
+wrote out/tasks.csv (658 bytes)
+7 entities, 16 references
 ```
 
-The CSV for cars:
+The CSV for tasks:
 
 ```csv
-_id,_type,_path,created,engine,name,owners,specs.power.unit,specs.power.value,specs.weight.unit,specs.weight.value,status,tags,year
-honda.car,car,cars/honda.car.md,2026-01-12,k20.engine,Honda Civic,alfonso.person,hp,158,kg,1300,owned,daily;reliable,2019
-mazda.car,car,cars/mazda.md,2026-02-03,13b.engine,Mazda RX-8,,,,,,wishlist,weekend,2004
+_id,_type,_path,assignees,blocked_by,created,due,effort.estimate.unit,effort.estimate.value,effort.spent.unit,effort.spent.value,priority,project,status,tags,title
+1782055272999.task,task,tasks/1782055272999.md,marta.person,write-schemas.task,2026-02-03,,,,,,normal,second-brain.project,blocked,import,Import the old notes
+book-a-van.task,task,tasks/book-a-van.task.md,marta.person,,2026-03-01,2026-03-14,,,,,normal,home-move.project,todo,errand,Book a van for moving day
+write-schemas.task,task,tasks/write-schemas.task.md,alfonso.person,,2026-01-12,2026-02-10,h,6,h,2,high,second-brain.project,doing,schema;deep-work,Write the schemas for the second brain
 ```
 
 **About `--format sqlite`.** There is no way to write a real SQLite file without a dependency, and this project has none. So `--format sqlite` writes a **SQL script** instead, with the same tables the spec asks for, including the `refs` table with `from_id`, `field`, `to_id`. Pipe it into `sqlite3`:
 
 ```
 $ tmd export --format sqlite --out brain.sql
+wrote brain.sql (5209 bytes)
+7 entities, 16 references
 $ sqlite3 brain.db < brain.sql
-$ sqlite3 brain.db "select c.name, e.name from cars c join refs r on r.from_id = c._id and r.field = 'engine' join engines e on e._id = r.to_id;"
-Honda Civic|Honda K20
-Mazda RX-8|Mazda 13B-MSP Renesis
+$ sqlite3 brain.db "select t.title, p.name from tasks t join refs r on r.from_id = t._id and r.field = 'project' join projects p on p._id = r.to_id;"
+Import the old notes|Build my second brain
+Book a van for moving day|Move to the new flat
+Write the schemas for the second brain|Build my second brain
 ```
 
 The script starts with `DROP TABLE IF EXISTS`, so it rebuilds in full every time. The export never writes back. If you want to change data, change the file and lint it.
@@ -509,14 +525,38 @@ $ tmd graph
 digraph tmd {
   rankdir=LR;
   node [shape=box, fontname="Helvetica"];
-  subgraph "cluster_car" {
-    label="car";
-    "honda.car";
-    "mazda.car";
+  subgraph "cluster_person" {
+    label="person";
+    "alfonso.person";
+    "marta.person";
   }
-  ...
-  "honda.car" -> "k20.engine" [label="engine"];
-  "honda.car" -> "alfonso.person" [label="owners.0"];
+  subgraph "cluster_project" {
+    label="project";
+    "home-move.project";
+    "second-brain.project";
+  }
+  subgraph "cluster_task" {
+    label="task";
+    "1782055272999.task";
+    "book-a-van.task";
+    "write-schemas.task";
+  }
+  "1782055272999.task" -> "marta.person" [label="assignees.0"];
+  "1782055272999.task" -> "write-schemas.task" [label="blocked_by"];
+  "1782055272999.task" -> "second-brain.project" [label="project"];
+  "alfonso.person" -> "write-schemas.task" [label="focus"];
+  "alfonso.person" -> "second-brain.project" [label="projects.0"];
+  "book-a-van.task" -> "marta.person" [label="assignees.0"];
+  "book-a-van.task" -> "home-move.project" [label="project"];
+  "home-move.project" -> "marta.person" [label="lead"];
+  "home-move.project" -> "book-a-van.task" [label="next"];
+  "marta.person" -> "1782055272999.task" [label="focus"];
+  "marta.person" -> "second-brain.project" [label="projects.0"];
+  "marta.person" -> "home-move.project" [label="projects.1"];
+  "second-brain.project" -> "alfonso.person" [label="lead"];
+  "second-brain.project" -> "write-schemas.task" [label="next"];
+  "write-schemas.task" -> "alfonso.person" [label="assignees.0"];
+  "write-schemas.task" -> "second-brain.project" [label="project"];
 }
 ```
 
@@ -541,7 +581,7 @@ All of the output below comes from real runs of `tmd lint` in `examples/broken/`
 $ cd examples/broken
 $ tmd lint
 ...
-16 errors, 15 warnings in 13 files
+16 errors, 16 warnings in 14 files
 ```
 
 | Code | Level | Meaning |
@@ -568,44 +608,44 @@ $ tmd lint
 E001, the type has no schema:
 
 ```
-cars/truck.vehicle.md: E001 no schema exists for type "vehicle"
-    hint: create .tmd/vehicle.schema.json, known types: car, engine, person
+tasks/backup.routine.md: E001 no schema exists for type "routine"
+    hint: create .tmd/routine.schema.json, known types: person, project, task
 ```
 
 E002, a required field is missing. The message carries the type and the schema description of the field, so the error is also the documentation:
 
 ```
-cars/civic.car.md:1: E002 year: missing required field "year" (integer, The model year.)
-    hint: add year: <integer> to the frontmatter
+tasks/import-notes.task.md:1: E002 title: missing required field "title" (string, What has to be done.)
+    hint: add title: <string> to the frontmatter
 ```
 
 E003, a value fails the schema, and a field the schema does not know:
 
 ```
-cars/civic.car.md:2: E003 status: expected one of "owned", "sold", "wishlist", got string "running"
-    hint: Where the car sits in my life.
-cars/civic.car.md:5: E003 colour: unknown field "colour", this type does not allow extra fields
-    hint: known fields: name, year, status, engine, owners, nickname, created, tags
+tasks/import-notes.task.md:3: E003 status: expected one of "todo", "doing", "blocked", "done", got string "running"
+    hint: Where the task stands.
+tasks/import-notes.task.md:4: E003 urgency: unknown field "urgency", this type does not allow extra fields
+    hint: known fields: title, status, project, assignees, blocked_by, owner, created, tags
 ```
 
 E004, a reference that goes nowhere, with a suggestion:
 
 ```
-cars/civic.car.md:4: E004 engine: reference "k21.engine" not found
-    hint: did you mean k20.engine?
+tasks/import-notes.task.md:2: E004 project: reference "second-brian.project" not found
+    hint: did you mean second-brain.project?
 ```
 
 E005, a reference to the wrong type:
 
 ```
-cars/rx7.car.md:4: E005 engine: expected type engine, found person
+tasks/pack-the-books.task.md:4: E005 project: expected type project, found person
     hint: "alfonso.person" points at people/alfonso.person.md
 ```
 
 E006, two files claiming the same id:
 
 ```
-archive/civic.car.md: E006 duplicate entity id "civic.car", also used by cars/civic.car.md
+archive/import-notes.task.md: E006 duplicate entity id "import-notes.task", also used by tasks/import-notes.task.md
     hint: an id is <slug>.<type> and must be unique in the project, rename one of the files
 ```
 
@@ -621,14 +661,14 @@ notes/weird.md:2: E007 _type: _type "Not A Type" is not a valid type name
 E008, frontmatter that cannot be read. The parser says exactly what it could not handle and on which line:
 
 ```
-cars/broken-yaml.car.md:3: E008 block scalars (| and >) are not supported
+tasks/broken-yaml.task.md:3: E008 block scalars (| and >) are not supported
     hint: a typed file starts with --- on line 1, a YAML mapping, then a closing ---
 ```
 
 E009, a section the schema asks for is missing from the body:
 
 ```
-cars/rx7.car.md:8: E009 the body is missing the required section "Notes"
+tasks/pack-the-books.task.md:8: E009 the body is missing the required section "Notes"
     hint: add a heading "## Notes" to the body
 ```
 
@@ -643,7 +683,7 @@ E010, a broken schema file. One line per problem:
 E011, an entity that points at itself:
 
 ```
-people/alfonso.person.md:3: E011 mentor: the entity references itself through "mentor"
+tasks/loop.task.md:4: E011 blocked_by: the entity references itself through "blocked_by"
     hint: set "x-tmd-ref-self": true on the field when a self reference is wanted
 ```
 
@@ -664,30 +704,30 @@ people/nobody.person.md: W002 no entity references this file
 W003, a deprecated field:
 
 ```
-cars/civic.car.md:6: W003 nickname: the field "nickname" is deprecated since 2026-01-01
+tasks/import-notes.task.md:5: W003 owner: the field "owner" is deprecated since 2026-01-01
     hint: remove the field, the schema marked it deprecated
 ```
 
 W004 and W005, the two fixable warnings:
 
 ```
-cars/rx7.car.md:5: W004 owners.0: reference "../people/alfonso.person.md" is a path, the id form is "alfonso.person"
+tasks/pack-the-books.task.md:5: W004 assignees.0: reference "../people/alfonso.person.md" is a path, the id form is "alfonso.person"
     hint: run tmd lint --fix to rewrite it, ids survive file moves
-cars/civic.car.md:2: W005 status: field order differs from the schema order, expected name, status, engine, nickname, created, colour
+tasks/import-notes.task.md:2: W005 project: field order differs from the schema order, expected status, project, owner, created, urgency
     hint: run tmd lint --fix to reorder the fields
 ```
 
 W006, the file name and `_type` disagree:
 
 ```
-cars/mx5.person.md:2: W006 _type: the file name says type "person" but _type says "car", _type was used
-    hint: rename the file to mx5.car.md, or change _type to person
+tasks/groceries.person.md:2: W006 _type: the file name says type "person" but _type says "task", _type was used
+    hint: rename the file to groceries.task.md, or change _type to person
 ```
 
 W007, a slug that is not a plain slug:
 
 ```
-cars/My_Car.car.md: W007 the slug "My_Car" is not lowercase letters, digits and hyphens
+tasks/My_Task.task.md: W007 the slug "My_Task" is not lowercase letters, digits and hyphens
     hint: rename the file so the part before the type is a plain slug, for example civic-2019
 ```
 
@@ -696,16 +736,16 @@ cars/My_Car.car.md: W007 the slug "My_Car" is not lowercase letters, digits and 
 `--fix` only makes changes that cannot lose information. It rewrites path references to id references (W004) and puts the fields in schema order with `_type` first (W005). It works on the raw frontmatter lines, so comments, quoting style, blank lines, and the body are kept exactly as they were.
 
 ```
-$ tmd lint cars/messy.car.md
-cars/messy.car.md:2: W005 year: field order differs from the schema order, expected name, year, engine, created
+$ tmd lint tasks/messy.task.md
+tasks/messy.task.md:2: W005 status: field order differs from the schema order, expected title, status, project, created
     hint: run tmd lint --fix to reorder the fields
-cars/messy.car.md:5: W004 engine: reference "../engines/k20.engine.md" is a path, the id form is "k20.engine"
+tasks/messy.task.md:4: W004 project: reference "../projects/home-move.project.md" is a path, the id form is "home-move.project"
     hint: run tmd lint --fix to rewrite it, ids survive file moves
 0 errors, 2 warnings in 1 file
 
-$ tmd lint cars/messy.car.md --fix
+$ tmd lint tasks/messy.task.md --fix
 fixed 1 file:
-  cars/messy.car.md (W004, W005)
+  tasks/messy.task.md (W004, W005)
 0 errors, 0 warnings in 1 file
 ```
 
@@ -720,13 +760,13 @@ Supported:
 - Block mappings, nested to any depth.
 - Block sequences (`- item`), both indented under the key and at the same indent as the key.
 - Sequences of mappings (`- person: a.person` followed by more keys at the same indent) and nested sequences.
-- Flow mappings (`{ value: 158, unit: hp }`) and flow sequences (`[a, b]`), nested in each other, on one line.
+- Flow mappings (`{ value: 6, unit: h }`) and flow sequences (`[a, b]`), nested in each other, on one line.
 - Single quoted strings, with `''` for a literal quote.
 - Double quoted strings, with the escapes `\n \t \r \b \f \0 \" \\ \/` and `\uXXXX`.
 - Quoted keys.
 - Plain scalars: integers, floats (including exponent form), `true`/`false` (and `True`, `TRUE`), `null`, `Null`, `NULL`, `~`, an empty value, and everything else as a string.
 - Comments, either on their own line or after a value, and blank lines anywhere.
-- A line number for every key and every sequence item, keyed by its dotted path (`specs.power.value`, `owners.0`).
+- A line number for every key and every sequence item, keyed by its dotted path (`effort.estimate.value`, `assignees.0`).
 
 Not supported, each one an error with its line:
 
@@ -755,10 +795,10 @@ Read but never validated against: `$schema`, `$id`, `$comment`, `title`, `descri
 Error messages always name the field path, what was expected, and what was found:
 
 ```
-year: expected integer, got string "2019"
-status: expected one of "owned", "sold", "wishlist", got string "running"
-specs.power.value: expected number, got string "x"
-owners.1: expected string, got number 2
+title: expected string, got number 42
+status: expected one of "todo", "doing", "blocked", "done", got string "running"
+effort.estimate.value: expected number, got string "x"
+assignees.1: expected string, got number 2
 ```
 
 ## Exit codes
@@ -778,13 +818,13 @@ owners.1: expected string, got number 2
 ```json
 [
   {
-    "path": "cars/civic.car.md",
-    "line": 4,
+    "path": "tasks/import-notes.task.md",
+    "line": 2,
     "code": "E004",
     "level": "error",
-    "field": "engine",
-    "message": "reference \"k21.engine\" not found",
-    "hint": "did you mean k20.engine?"
+    "field": "project",
+    "message": "reference \"second-brian.project\" not found",
+    "hint": "did you mean second-brain.project?"
   }
 ]
 ```
@@ -809,9 +849,9 @@ Color is used in human output only when the output is a terminal. `NO_COLOR` swi
 
 The format is designed so an agent can do the whole loop with three commands and no memory of the schema:
 
-1. `tmd schema show car` prints the schema and the example file. The agent now knows exactly what a valid `car` looks like.
-2. `tmd new car honda cars/` creates a valid skeleton. The agent fills it in.
-3. `tmd lint cars/honda.car.md --json` returns an empty array or a list of exact fixes. The agent applies them and runs it again.
+1. `tmd schema show task` prints the schema and the example file. The agent now knows exactly what a valid `task` looks like.
+2. `tmd new task review-inbox tasks/` creates a valid skeleton. The agent fills it in.
+3. `tmd lint tasks/review-inbox.task.md --json` returns an empty array or a list of exact fixes. The agent applies them and runs it again.
 
 Rules worth putting in your project's agent instructions:
 
@@ -824,10 +864,10 @@ Rules worth putting in your project's agent instructions:
 
 ## The examples folder
 
-- `examples/` is a small real project: two cars, two engines, two people, with its own `.tmd/` schemas. It lints clean.
-- `examples/broken/` is the same project bent out of shape, so that every error and warning code fires at least once. It is its own project, with its own `.tmd/` folder, and the clean project excludes it.
+- `examples/` is a small real project: two projects, three tasks, two people, with its own `.tmd/` schemas. It lints clean, with `refs.orphans: warn` on and nothing floating.
+- `examples/broken/` is the same project bent out of shape, so that every error and warning code fires at least once. It is its own project, with its own `.tmd/` folder, and the clean project excludes it. Its README says what each file does wrong.
 
-Both are copied into `test/fixtures/`, where the end to end tests run them through the real CLI.
+`test/fixtures/` holds its own copies of a clean and a broken project, used by the end to end tests. They are separate from `examples/`, so the tests do not break when the example data changes.
 
 ## How the code is laid out
 

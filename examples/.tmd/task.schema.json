@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "task",
+  "description": "One thing to do, small enough to finish.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "status"],
+  "properties": {
+    "title": { "type": "string", "minLength": 1, "description": "What has to be done." },
+    "status": { "enum": ["todo", "doing", "blocked", "done"], "default": "todo", "description": "Where the task stands." },
+    "priority": { "enum": ["low", "normal", "high"], "default": "normal", "description": "How much it matters." },
+    "project": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "project", "description": "The project this task belongs to." },
+    "assignees": {
+      "type": "array",
+      "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person" },
+      "description": "People doing the work."
+    },
+    "blocked_by": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "task", "description": "The task that has to finish first." },
+    "due": { "type": "string", "format": "date", "description": "The day it is due." },
+    "effort": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "estimate": { "$ref": "#/$defs/measure" },
+        "spent": { "$ref": "#/$defs/measure" }
+      },
+      "description": "Time numbers with units."
+    },
+    "created": { "type": "string", "format": "date" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit"],
+      "properties": { "value": { "type": "number" }, "unit": { "type": "string" } }
+    }
+  },
+  "x-tmd": {
+    "example": "tasks/write-schemas.task.md",
+    "sections": ["Notes"],
+    "plural": "tasks"
+  }
+}

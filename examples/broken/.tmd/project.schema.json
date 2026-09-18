@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "engine",
+  "title": "project",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "layout"],
+  "required": ["name", "status"],
   "properties": {
     "name": { "type": "string", "minLength": 1 },
-    "layout": { "enum": ["inline-4", "inline-6", "v6", "v8", "rotary", "electric"] },
+    "status": { "enum": ["active", "paused", "done"] },
     "created": { "type": "string", "format": "date" },
     "tags": { "type": "array", "items": { "type": "string" } }
   }

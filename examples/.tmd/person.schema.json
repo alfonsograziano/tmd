@@ -9,10 +9,11 @@
     "name": { "type": "string", "minLength": 1, "description": "Full name." },
     "email": { "type": "string", "format": "email", "description": "Email address." },
     "role": { "type": "string", "description": "What they do." },
-    "drives": {
+    "focus": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "task", "description": "The task they are on right now." },
+    "projects": {
       "type": "array",
-      "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": ["car"] },
-      "description": "Cars they drive."
+      "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": ["project"] },
+      "description": "Projects they are part of."
     },
     "created": { "type": "string", "format": "date" },
     "tags": { "type": "array", "items": { "type": "string" } }

@@ -1,10 +1,10 @@
 ---
-name: The Nameless One
-year: 2001
+title: The badly named one
+status: todo
 created: 2026-03-01
 ---
 
-# The Nameless One
+# The badly named one
 
 ## Notes
 

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "project",
+  "description": "A piece of work with more than one task in it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "status"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1, "description": "What the project is called." },
+    "status": { "enum": ["active", "paused", "done"], "default": "active", "description": "Where the project stands." },
+    "lead": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person", "description": "The person who owns it." },
+    "next": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "task", "description": "The next task to pick up." },
+    "created": { "type": "string", "format": "date" },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+  "x-tmd": { "plural": "projects" }
+}

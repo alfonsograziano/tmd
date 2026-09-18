@@ -1,6 +1,6 @@
 ---
 _type: Not A Type
-name: Weird
+title: Weird
 ---
 
 # Weird

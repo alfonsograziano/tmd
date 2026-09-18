@@ -1,11 +1,12 @@
 ---
 name: Alfonso Graziano
 email: info@alfonsograziano.it
-role: Owner of the Civic
-drives: [honda.car]
+role: Owner of the second brain
+focus: write-schemas.task
+projects: [second-brain.project]
 created: 2026-01-12
 ---
 
 # Alfonso Graziano
 
-Drives the Civic every day.
+Writes the schemas and reviews what the agent adds.

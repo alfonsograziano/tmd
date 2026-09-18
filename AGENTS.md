@@ -46,8 +46,8 @@ Set `TMD_TODAY=2026-09-18` for anything that depends on the date. The tests alre
 | `src/lint.ts` | The rule engine. Every code from E001 to E011 and W001 to W007 is raised here or in `schemas.ts`. |
 | `src/fix.ts` | The safe fixes for W004 and W005, and the placeholder values. |
 | `src/cli.ts` | Argument parsing with `node:util` `parseArgs`, and command dispatch. Keep it thin. |
-| `test/fixtures/` | Whole projects on disk: `clean`, `broken`, `frontmatter-type`. |
-| `examples/` | The documented example project, plus `examples/broken/`. The README quotes real output from both. |
+| `test/fixtures/` | Whole projects on disk: `clean`, `broken`, `frontmatter-type`. The tests own them. They are not the example project, and they do not have to use the same types. |
+| `examples/` | The documented example project, plus `examples/broken/`. Its types are `project`, `task`, and `person`. The README quotes real output from both, so re-run the commands when you change a file there. |
 
 ## When you change behaviour
 

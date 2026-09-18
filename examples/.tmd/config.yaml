@@ -5,5 +5,5 @@ untyped: ignore          # README.md has no type, and that is fine
 type_in: filename        # tmd new writes <slug>.<type>.md
 refs:
   allow_paths: true
-  orphans: ignore        # nothing points at a car, and that is fine here
+  orphans: warn          # something points at every entity here
 strict: false

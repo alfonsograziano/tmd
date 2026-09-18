@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "task",
+  "description": "A task. Same as the clean project, plus a deprecated field.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "status"],
+  "properties": {
+    "title": { "type": "string", "minLength": 1, "description": "What has to be done." },
+    "status": { "enum": ["todo", "doing", "blocked", "done"], "default": "todo", "description": "Where the task stands." },
+    "project": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "project", "description": "The project this task belongs to." },
+    "assignees": {
+      "type": "array",
+      "items": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "person" },
+      "description": "People doing the work."
+    },
+    "blocked_by": { "type": "string", "format": "tmd-ref", "x-tmd-ref": "task", "description": "The task that has to finish first." },
+    "owner": { "type": "string", "description": "The one person on it.", "x-tmd": { "deprecated": "2026-01-01" } },
+    "created": { "type": "string", "format": "date", "description": "The day the file was written." },
+    "tags": { "type": "array", "items": { "type": "string" } }
+  },
+  "x-tmd": { "sections": ["Notes"], "plural": "tasks" }
+}
