@@ -1,0 +1,35 @@
+{
+  "name": "tmd",
+  "version": "0.1.0",
+  "description": "Typed Markdown: a small format for semi-structured data in plain markdown files, with a schema and a linter.",
+  "license": "MIT",
+  "author": "Alfonso Graziano",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "bin": {
+    "tmd": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "spec",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "tmd": "node ./src/cli.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^24.13.5",
+    "typescript": "^5.9.3"
+  }
+}

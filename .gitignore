@@ -1,0 +1,5 @@
+node_modules/
+.tmd/cache/
+tmd-export/
+*.tsbuildinfo
+.DS_Store
